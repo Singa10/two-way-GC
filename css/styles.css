@@ -54,18 +54,23 @@ ul { margin: 0; }
 .site-header {
   position: sticky; top: 0; left: 0; width: 100%; z-index: 500;
   height: var(--header-h);
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 0 5vw;
   background: rgba(255,255,255,.94);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--grey-200);
+  overflow: hidden; /* header itself never grows/spills into content below */
 }
-.brand { display: flex; align-items: center; gap: 12px; }
-.brand img { height: 34px; width: auto; }
-.brand__text { display: flex; flex-direction: column; line-height: 1; }
-.brand__tag { color: var(--grey-600); font-size: 10px; letter-spacing: .12em; margin-top: 4px; font-family: var(--font-head); text-transform: uppercase; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
+.brand img { height: 34px; width: auto; flex: 0 0 auto; }
+.brand__text { display: flex; flex-direction: column; line-height: 1; min-width: 0; overflow: hidden; }
+.brand__tag {
+  color: var(--grey-600); font-size: 10px; letter-spacing: .1em; margin-top: 4px;
+  font-family: var(--font-head); text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
-.nav { display: flex; align-items: center; gap: 34px; }
+.nav { display: flex; align-items: center; gap: 34px; flex: 0 0 auto; }
 .nav__list { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
 .nav__list a {
   color: var(--navy); font-family: var(--font-head); font-size: 15px;
@@ -78,30 +83,42 @@ ul { margin: 0; }
 .nav__list a:hover::after, .nav__list a[aria-current="page"]::after { width: 100%; }
 .nav__list a[aria-current="page"] { color: var(--orange); }
 
-.nav__cta { margin-left: 6px; }
+.nav__cta { margin-left: 6px; flex: 0 0 auto; white-space: nowrap; }
 
 .nav__toggle {
   display: none; width: 40px; height: 40px; border: none; background: none; cursor: pointer;
-  flex-direction: column; justify-content: center; gap: 5px;
+  flex: 0 0 auto; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
 }
-.nav__toggle span { display: block; height: 2px; background: var(--navy); border-radius: 2px; }
+.nav__toggle span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; }
 
+/* Tablet & below: collapse the inline nav list + CTA into a hamburger menu */
 @media (max-width: 900px) {
   .nav__list {
-    position: fixed; top: var(--header-h); left: 0; right: 0;
+    position: fixed; top: var(--header-h); left: 0; right: 0; z-index: 400;
     flex-direction: column; background: var(--white); padding: 18px 6vw 28px;
     gap: 18px; transform: translateY(-120%); transition: transform .35s var(--ease);
     border-bottom: 1px solid var(--grey-200); box-shadow: 0 20px 30px -20px rgba(0,0,0,.15);
+    max-height: calc(100svh - var(--header-h)); overflow-y: auto;
   }
   .nav__list.open { transform: translateY(0); }
   .nav__toggle { display: flex; }
   .nav__cta { display: none; }
 }
 
+/* Phones: the long tagline doesn't fit next to logo + hamburger, so drop it
+   and shrink the header/logo instead of letting anything overlap or clip. */
+@media (max-width: 560px) {
+  :root { --header-h: 64px; }
+  .site-header { padding: 0 4vw; }
+  .brand img { height: 26px; }
+  .brand__tag { display: none; }
+  .nav { gap: 14px; }
+}
+
 /* ---------- Hero (Home) ---------- */
 .hero {
   position: relative; overflow: hidden;
-  background: linear-gradient(155deg, var(--grey-600) 0%, var(--navy) 55%, var(--navy-2) 100%);
+  background: linear-gradient(155deg, var(--navy-deep) 0%, var(--navy) 55%, var(--navy-2) 100%);
   padding: 90px 6vw 0;
 }
 .hero__grid {
@@ -118,8 +135,9 @@ ul { margin: 0; }
 .hero__stats div b { display: block; color: var(--orange); font-family: var(--font-head); font-size: 30px; }
 .hero__stats div span { color: var(--grey-400); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-family: var(--font-head); }
 
-.hero__art { position: relative; height: 420px; }
-.hero__art svg { width: 100%; height: 100%; }
+.hero__art { position: relative; height: 420px; border-radius: var(--radius); overflow: hidden; box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
+.hero__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero__art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(16,24,39,0) 55%, rgba(16,24,39,.55) 100%); pointer-events: none; }
 
 /* ---------- Sections ---------- */
 .section { padding: 100px 6vw; max-width: var(--container); margin: 0 auto; }
@@ -175,7 +193,7 @@ ul { margin: 0; }
 .step h4 { color: var(--navy); font-size: 17px; margin-bottom: 8px; }
 .step p { color: var(--grey-600); font-family: var(--font-body); font-size: 14px; line-height: 1.6; text-transform: none; letter-spacing: normal; }
 
-/* ---------- About: timeline (simple, no 3D/scroll-jack) ---------- */
+/* ---------- About: timeline ---------- */
 .timeline { position: relative; margin-top: 60px; padding-left: 30px; border-left: 2px solid var(--grey-200); }
 .timeline__item { position: relative; padding-bottom: 44px; }
 .timeline__item:last-child { padding-bottom: 0; }
@@ -201,11 +219,10 @@ ul { margin: 0; }
 .service-block:last-child { border-bottom: none; }
 .service-block:nth-child(even) .service-block__art { order: 2; }
 .service-block__art {
-  aspect-ratio: 4/3; border-radius: var(--radius); background: var(--grey-100);
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-  border: 1px solid var(--grey-200);
+  position: relative; aspect-ratio: 4/3; border-radius: var(--radius); background: var(--grey-100);
+  overflow: hidden; border: 1px solid var(--grey-200);
 }
-.service-block__art svg { width: 60%; height: 60%; }
+.service-block__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .service-block__list { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 10px; }
 .service-block__list li { display: flex; gap: 10px; align-items: flex-start; color: var(--grey-600); font-family: var(--font-body); font-size: 15px; }
 .service-block__list li::before { content: '\2713'; color: var(--orange); font-weight: 700; }
@@ -266,4 +283,3 @@ ul { margin: 0; }
   .hero__art { height: 260px; order: -1; }
   .section { padding: 64px 6vw; }
 }
-
