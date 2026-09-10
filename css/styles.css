@@ -59,7 +59,6 @@ ul { margin: 0; }
   background: rgba(255,255,255,.94);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--grey-200);
-  overflow: hidden; /* header itself never grows/spills into content below */
 }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
 .brand img { height: 34px; width: auto; flex: 0 0 auto; }
@@ -71,7 +70,7 @@ ul { margin: 0; }
 }
 
 .nav { display: flex; align-items: center; gap: 34px; flex: 0 0 auto; }
-.nav__list { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+.nav__list { list-style: none; display: flex; align-items: center; gap: 30px; margin: 0; padding: 0; }
 .nav__list a {
   color: var(--navy); font-family: var(--font-head); font-size: 15px;
   letter-spacing: .06em; text-transform: uppercase; position: relative; padding: 6px 0;
@@ -85,24 +84,40 @@ ul { margin: 0; }
 
 .nav__cta { margin-left: 6px; flex: 0 0 auto; white-space: nowrap; }
 
+/* CTA duplicated inside the dropdown for mobile — hidden on desktop, since
+   the inline .nav__cta above already covers that case there. */
+.nav__list-cta { display: none; width: 100%; margin-top: 4px; }
+.nav__list-cta a {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  padding: 14px 20px; border-radius: 6px; background: var(--orange); color: var(--navy-deep);
+  font-family: var(--font-head); letter-spacing: .08em; text-transform: uppercase; font-size: 14px;
+}
+.nav__list-cta a::after { content: none; }
+
 .nav__toggle {
   display: none; width: 40px; height: 40px; border: none; background: none; cursor: pointer;
   flex: 0 0 auto; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  position: relative; z-index: 600;
 }
-.nav__toggle span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; }
+.nav__toggle span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; transition: transform .25s var(--ease), opacity .25s var(--ease); }
+.nav__toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav__toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav__toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* Tablet & below: collapse the inline nav list + CTA into a hamburger menu */
 @media (max-width: 900px) {
   .nav__list {
-    position: fixed; top: var(--header-h); left: 0; right: 0; z-index: 400;
-    flex-direction: column; background: var(--white); padding: 18px 6vw 28px;
+    position: fixed; top: var(--header-h); left: 0; right: 0; z-index: 450;
+    flex-direction: column; align-items: stretch; background: var(--white); padding: 18px 6vw 28px;
     gap: 18px; transform: translateY(-120%); transition: transform .35s var(--ease);
     border-bottom: 1px solid var(--grey-200); box-shadow: 0 20px 30px -20px rgba(0,0,0,.15);
     max-height: calc(100svh - var(--header-h)); overflow-y: auto;
+    visibility: hidden;
   }
-  .nav__list.open { transform: translateY(0); }
+  .nav__list.open { transform: translateY(0); visibility: visible; }
   .nav__toggle { display: flex; }
   .nav__cta { display: none; }
+  .nav__list-cta { display: block; }
 }
 
 /* Phones: the long tagline doesn't fit next to logo + hamburger, so drop it
@@ -193,7 +208,7 @@ ul { margin: 0; }
 .step h4 { color: var(--navy); font-size: 17px; margin-bottom: 8px; }
 .step p { color: var(--grey-600); font-family: var(--font-body); font-size: 14px; line-height: 1.6; text-transform: none; letter-spacing: normal; }
 
-/* ---------- About: timeline ---------- */
+/* ---------- About: timeline (simple, no 3D/scroll-jack) ---------- */
 .timeline { position: relative; margin-top: 60px; padding-left: 30px; border-left: 2px solid var(--grey-200); }
 .timeline__item { position: relative; padding-bottom: 44px; }
 .timeline__item:last-child { padding-bottom: 0; }

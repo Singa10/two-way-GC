@@ -3,14 +3,37 @@
 // ---------- Nav toggle (mobile) ----------
 const toggle = document.querySelector('.nav__toggle');
 const navList = document.querySelector('.nav__list');
+
+function setMenu(open) {
+  if (!toggle || !navList) return;
+  navList.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', String(open));
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
 if (toggle && navList) {
   toggle.addEventListener('click', () => {
-    const open = navList.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
+    setMenu(!navList.classList.contains('open'));
   });
   navList.querySelectorAll('a').forEach((a) =>
-    a.addEventListener('click', () => navList.classList.remove('open'))
+    a.addEventListener('click', () => setMenu(false))
   );
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMenu(false);
+  });
+  document.addEventListener('click', (e) => {
+    if (
+      navList.classList.contains('open') &&
+      !navList.contains(e.target) &&
+      !toggle.contains(e.target)
+    ) {
+      setMenu(false);
+    }
+  });
+  // Closing the menu via resize back to desktop avoids it getting stuck open
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900) setMenu(false);
+  });
 }
 
 // ---------- Reveal-on-scroll ----------
