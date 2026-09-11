@@ -17,14 +17,6 @@ assets/images/logo.png        Wordmark-only crop of the supplied logo (transpare
 assets/images/logo-full.png     Full lockup (mark + tagline lines), used on the About page
 ```
 
-## Run locally
-
-Just open `index.html` in a browser, or serve the folder:
-
-```bash
-python3 -m http.server 8080
-```
-
 ## Brand
 
 - Navy `#1D2A4F`, Orange `#F47019` — sampled directly from the supplied logo.
